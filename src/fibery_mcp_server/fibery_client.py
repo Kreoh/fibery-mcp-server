@@ -117,7 +117,7 @@ class CreateDocumentResponse:
     message: str
 
 
-def normalize_str(s: str) -> str:
+def normalise_str(s: str) -> str:
     return s.replace(" ", "_").replace("-", "_")
 
 
@@ -265,13 +265,15 @@ class FiberyClient:
         return await self.execute_command(
             "fibery.command/batch",
             {
-                "commands": list(map(lambda entity: {
-                    "command": "fibery.entity/create",
-                    "args": {
-                        "type": database,
-                        "entity": entity
-                    }
-                }, entities)),
+                "commands": list(
+                    map(
+                        lambda entity: {
+                            "command": "fibery.entity/create",
+                            "args": {"type": database, "entity": entity},
+                        },
+                        entities,
+                    )
+                ),
             },
         )
 
@@ -340,4 +342,4 @@ class FiberyClient:
         return str(result.result[0]["Public Id"])
 
     def compose_url(self, space: str, database: str, public_id: str) -> str:
-        return f"{'https' if self.__fibery_https else 'http'}://{self.__fibery_host}/{normalize_str(space)}/{normalize_str(database)}/{public_id}"
+        return f"{'https' if self.__fibery_https else 'http'}://{self.__fibery_host}/{normalise_str(space)}/{normalise_str(database)}/{public_id}"

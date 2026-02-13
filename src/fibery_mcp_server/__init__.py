@@ -1,5 +1,5 @@
 """
-Fibery MCP Server initialization
+Fibery MCP Server initialisation
 """
 
 from . import server

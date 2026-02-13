@@ -54,7 +54,7 @@ Tool use:
     }
 }
 
-Query: Summarize Accounting contacts with public id 1.
+Query: Summarise Accounting contacts with public id 1.
 Tool use:
 {
     "q_from": "Accounting/Acc Contacts",
