@@ -1,0 +1,26 @@
+Update collection relation fields using Fibery collection commands.
+This tool supports adding or removing relation items via `fibery.entity/add-collection-items` and `fibery.entity/remove-collection-items`.
+
+Use this tool when updating collection relation fields (for example, assignees) instead of `update_entity`.
+
+Example: Add assignee to a card
+{
+    "database": "Kanban/Card",
+    "entity_id": "ea5a9b77-d16b-4bdc-b4f2-5dad6764ad0f",
+    "field": "assignments/assignees",
+    "operation": "add",
+    "item_ids": [
+        "f2a89e59-6a5a-439c-ab10-5e376548e8c9"
+    ]
+}
+
+Example: Remove assignee from a card
+{
+    "database": "Kanban/Card",
+    "entity_id": "ea5a9b77-d16b-4bdc-b4f2-5dad6764ad0f",
+    "field": "assignments/assignees",
+    "operation": "remove",
+    "item_ids": [
+        "f2a89e59-6a5a-439c-ab10-5e376548e8c9"
+    ]
+}

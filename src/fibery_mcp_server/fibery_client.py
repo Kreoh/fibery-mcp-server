@@ -295,6 +295,36 @@ class FiberyClient:
             },
         )
 
+    async def add_collection_items(
+        self, database: str, entity_id: str, field: str, item_ids: List[str]
+    ) -> CommandResponse:
+        return await self.execute_command(
+            "fibery.entity/add-collection-items",
+            {
+                "type": database,
+                "field": field,
+                "entity": {
+                    "fibery/id": entity_id,
+                },
+                "items": [{"fibery/id": item_id} for item_id in item_ids],
+            },
+        )
+
+    async def remove_collection_items(
+        self, database: str, entity_id: str, field: str, item_ids: List[str]
+    ) -> CommandResponse:
+        return await self.execute_command(
+            "fibery.entity/remove-collection-items",
+            {
+                "type": database,
+                "field": field,
+                "entity": {
+                    "fibery/id": entity_id,
+                },
+                "items": [{"fibery/id": item_id} for item_id in item_ids],
+            },
+        )
+
     async def get_public_id_by_id(self, database: str, fibery_id: str) -> str | None:
         result = await self.query(
             {

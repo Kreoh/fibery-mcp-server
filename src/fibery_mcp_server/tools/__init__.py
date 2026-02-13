@@ -10,10 +10,24 @@ from fibery_mcp_server.tools.current_date import current_date_tool_name, current
 from fibery_mcp_server.tools.create_entity import create_entity_tool_name, create_entity_tool, handle_create_entity
 from fibery_mcp_server.tools.create_entities_batch import create_entities_batch_tool_name, create_entities_batch_tool, handle_create_entities_batch
 from fibery_mcp_server.tools.update_entity import update_entity_tool_name, update_entity_tool, handle_update_entity
+from fibery_mcp_server.tools.update_collection import (
+    update_collection_tool_name,
+    update_collection_tool,
+    handle_update_collection,
+)
 
 
 def handle_list_tools():
-    return [current_date_tool(), schema_tool(), database_tool(), query_tool(), create_entity_tool(), create_entities_batch_tool(), update_entity_tool()]
+    return [
+        current_date_tool(),
+        schema_tool(),
+        database_tool(),
+        query_tool(),
+        create_entity_tool(),
+        create_entities_batch_tool(),
+        update_entity_tool(),
+        update_collection_tool(),
+    ]
 
 
 async def handle_tool_call(fibery_client: FiberyClient, name: str, arguments: Dict[str, Any]):
@@ -31,6 +45,8 @@ async def handle_tool_call(fibery_client: FiberyClient, name: str, arguments: Di
         return await handle_create_entities_batch(fibery_client, arguments)
     elif name == update_entity_tool_name:
         return await handle_update_entity(fibery_client, arguments)
+    elif name == update_collection_tool_name:
+        return await handle_update_collection(fibery_client, arguments)
     else:
         return [mcp.types.TextContent(type="text", text=f"Error: Unknown tool {name}")]
 
