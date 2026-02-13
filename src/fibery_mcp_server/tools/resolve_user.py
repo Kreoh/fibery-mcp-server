@@ -39,10 +39,6 @@ def resolve_user_tool() -> mcp.types.Tool:
                     "description": "Maximum number of identities to return.",
                 },
             },
-            "anyOf": [
-                {"required": ["email"]},
-                {"required": ["name"]},
-            ],
         },
     )
 

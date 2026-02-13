@@ -44,6 +44,16 @@ def _raw_schema_with_user_name_only_and_contact_email_only() -> dict[str, Any]:
     }
 
 
+async def test_resolve_user_requires_email_or_name_at_runtime() -> None:
+    schema = Schema(_raw_schema_with_user_name_only_and_contact_email_only())
+    client = _FakeResolveUserClient(schema, {})
+
+    response = await handle_resolve_user(client, {})
+
+    assert "either email or name" in response[0].text.lower()
+    assert client.queried_databases == []
+
+
 async def test_resolve_user_email_lookup_uses_fallback_database_with_email_only_field() -> None:
     schema = Schema(_raw_schema_with_user_name_only_and_contact_email_only())
     client = _FakeResolveUserClient(

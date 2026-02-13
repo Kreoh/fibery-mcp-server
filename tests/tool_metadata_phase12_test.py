@@ -67,17 +67,14 @@ def test_update_entities_batch_schema_requires_ids_and_confirmation() -> None:
     assert entity_item["properties"]["fibery/id"]["type"] == "string"
 
 
-def test_resolve_user_schema_requires_email_or_name_filter() -> None:
+def test_resolve_user_schema_is_top_level_object_without_any_of() -> None:
     schema = _input_schema(resolve_user_tool)
 
     assert schema["type"] == "object"
     assert schema.get("additionalProperties") is False
+    assert "anyOf" not in schema
 
     assert schema["properties"]["email"]["type"] == "string"
     assert schema["properties"]["name"]["type"] == "string"
     assert schema["properties"]["limit"]["type"] == "integer"
     assert schema["properties"]["limit"]["minimum"] == 1
-
-    any_of_required = [set(option["required"]) for option in schema["anyOf"]]
-    assert {"email"} in any_of_required
-    assert {"name"} in any_of_required
