@@ -5,9 +5,12 @@
 This MCP (Model Context Protocol) server provides integration between Fibery and any LLM provider supporting the MCP protocol (e.g., Claude for Desktop), allowing you to interact with your Fibery workspace using natural language.
 
 ## ✨ Features
-- Query Fibery entities using natural language
-- Get information about your Fibery databases and their fields
-- Create and update Fibery entities through conversational interfaces
+- Discover available Fibery databases and inspect their fields
+- Query Fibery entities with flexible `q/from`, `q/select`, `q/where`, ordering, and pagination
+- Create entities individually or in batch
+- Update existing entities, including rich-text document fields
+- Add or remove items in collection relation fields
+- Use a date helper tool for ISO 8601 timestamps in workflows and prompts
 
 ## 📦 Installation
 
@@ -76,26 +79,58 @@ Note: If "uv" command does not work, try absolute path (i.e. /Users/username/.lo
 
 ## 🚀 Available Tools
 
-#### 1. List Databases (`list_databases`)
+#### 1. Current Date (`current_date`)
+
+Returns the current date/time in ISO 8601 format (`YYYY-MM-DDTHH:MM:SS.000Z`).
+
+#### 2. List Databases (`list_databases`)
 
 Retrieves a list of all databases available in your Fibery workspace.
 
-#### 2. Describe Database (`describe_database`)
+#### 3. Describe Database (`describe_database`)
 
 Provides a detailed breakdown of a specific database's structure, showing all fields with their titles, names, and types.
 
-#### 3. Query Database (`query_database`)
+#### 4. Query Database (`query_database`)
 
-Offers powerful, flexible access to your Fibery data through the Fibery API.
+Provides flexible access to Fibery data through `fibery.entity/query` (including filters, sorting, pagination, and params).
 
-#### 4. Create Entity (`create_entity`)
+#### 5. Create Entity (`create_entity`)
 
 Creates new entities in your Fibery workspace with specified field values.
 
-#### 5. Create Entities (`create_entities_batch`)
+#### 6. Create Entities (`create_entities_batch`)
 
 Creates multiple new entities in your Fibery workspace with specified field values.
 
-#### 6. Update Entity (`update_entity`)
+#### 7. Update Entity (`update_entity`)
 
 Updates existing entities in your Fibery workspace with new field values.
+
+#### 8. Update Collection (`update_collection`)
+
+Adds or removes relation items in collection fields (for example, assigning or unassigning related entities).
+
+## 🧪 Development and Quality Checks
+
+Install dependencies:
+
+```bash
+uv sync --dev
+```
+
+Run quality gates:
+
+```bash
+uv lock --check
+uv run --frozen ruff check src tests
+uv run --frozen ruff format --check src tests
+uv run --frozen pytest
+```
+
+Install pre-commit hooks:
+
+```bash
+uv run --frozen pre-commit install
+uv run --frozen pre-commit install --hook-type commit-msg
+```
