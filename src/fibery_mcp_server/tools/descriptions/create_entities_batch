@@ -1,9 +1,14 @@
 Create multiple Fibery entities at once with specified fields.
+Safety constraints:
+- Maximum 50 entities per call.
+- For batches larger than 10 entities, set `confirm_batch` to `true`.
+
 Examples (note, that these databases are non-existent, use databases only from user's schema!):
 Query: Create some features
 Tool use:
 {
     "database": "Product Management/Feature",
+    "confirm_batch": true,
     "entities": [
         {
             "Product Management/Name": "New Feature 1",

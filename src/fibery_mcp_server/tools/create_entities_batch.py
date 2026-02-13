@@ -13,7 +13,9 @@ create_entities_batch_tool_name = "create_entities_batch"
 
 
 def create_entities_batch_tool() -> mcp.types.Tool:
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "descriptions", "create_entities_batch"), "r") as file:
+    with open(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "descriptions", "create_entities_batch"), "r"
+    ) as file:
         description = file.read()
 
     return mcp.types.Tool(
@@ -21,6 +23,7 @@ def create_entities_batch_tool() -> mcp.types.Tool:
         description=description,
         inputSchema={
             "type": "object",
+            "additionalProperties": False,
             "properties": {
                 "database": {
                     "type": "string",
@@ -28,8 +31,14 @@ def create_entities_batch_tool() -> mcp.types.Tool:
                 },
                 "entities": {
                     "type": "array",
+                    "minItems": 1,
+                    "maxItems": 50,
                     "items": {"type": "object"},
                     "description": 'List of dictionaries that define what fields to set in format [{"FieldName": value}] (i.e. [{"Product Management/Name": "My new entity"}]).',
+                },
+                "confirm_batch": {
+                    "type": "boolean",
+                    "description": "Explicit confirmation for large batches (more than 10 entities).",
                 },
             },
             "required": ["database", "entities"],
@@ -37,15 +46,29 @@ def create_entities_batch_tool() -> mcp.types.Tool:
     )
 
 
-async def handle_create_entities_batch(fibery_client: FiberyClient, arguments: Dict[str, Any]) -> List[mcp.types.TextContent]:
+async def handle_create_entities_batch(
+    fibery_client: FiberyClient, arguments: Dict[str, Any]
+) -> List[mcp.types.TextContent]:
     database_name: str = arguments.get("database")
     entities: List[Dict[str, Any]] = arguments.get("entities")
+    confirm_batch: bool = arguments.get("confirm_batch", False)
 
     if not database_name:
         return [mcp.types.TextContent(type="text", text="Error: database is not provided.")]
 
     if not entities or len(entities) == 0:
         return [mcp.types.TextContent(type="text", text="Error: entities is not provided.")]
+
+    if len(entities) > 50:
+        return [mcp.types.TextContent(type="text", text="Error: entities cannot contain more than 50 items.")]
+
+    if len(entities) > 10 and confirm_batch is not True:
+        return [
+            mcp.types.TextContent(
+                type="text",
+                text="Error: confirm_batch must be true for create batches larger than 10 entities.",
+            )
+        ]
 
     schema = await fibery_client.get_schema()
     database = schema.databases_by_name().get(database_name)
@@ -99,6 +122,9 @@ async def handle_create_entities_batch(fibery_client: FiberyClient, arguments: D
     entities_info_str = list(map(lambda ent: f'\nfibery/id: "{ent["id"]}" URL: "{ent["url"]}"', entities_info))
     return [
         mcp.types.TextContent(
-            type="text", text=str(f'{len(creation_batch_result.result)} entities created successfully. List of created entities:{entities_info_str}')
+            type="text",
+            text=str(
+                f"{len(creation_batch_result.result)} entities created successfully. List of created entities:{entities_info_str}"
+            ),
         )
     ]

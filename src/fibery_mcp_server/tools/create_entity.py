@@ -21,6 +21,7 @@ def create_entity_tool() -> mcp.types.Tool:
         description=description,
         inputSchema={
             "type": "object",
+            "additionalProperties": False,
             "properties": {
                 "database": {
                     "type": "string",
