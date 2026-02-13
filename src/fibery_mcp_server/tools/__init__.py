@@ -29,6 +29,11 @@ from fibery_mcp_server.tools.update_entities_batch import (
     update_entities_batch_tool,
     handle_update_entities_batch,
 )
+from fibery_mcp_server.tools.resolve_user import (
+    resolve_user_tool_name,
+    resolve_user_tool,
+    handle_resolve_user,
+)
 
 
 def handle_list_tools():
@@ -43,6 +48,7 @@ def handle_list_tools():
         update_collection_tool(),
         unlink_collection_tool(),
         update_entities_batch_tool(),
+        resolve_user_tool(),
     ]
 
 
@@ -67,6 +73,8 @@ async def handle_tool_call(fibery_client: FiberyClient, name: str, arguments: Di
         return await handle_unlink_collection(fibery_client, arguments)
     elif name == update_entities_batch_tool_name:
         return await handle_update_entities_batch(fibery_client, arguments)
+    elif name == resolve_user_tool_name:
+        return await handle_resolve_user(fibery_client, arguments)
     else:
         return [mcp.types.TextContent(type="text", text=f"Error: Unknown tool {name}")]
 

@@ -1,0 +1,19 @@
+Resolve Fibery user identities from email and/or name filters.
+
+This tool returns normalised identity records with:
+- fibery/id
+- email
+- name
+
+Inputs:
+- email (preferred exact match)
+- name (optional, partial match)
+- limit (optional, defaults to 10)
+
+Provide at least one of email or name.
+
+Example:
+{
+    "email": "alex@example.com",
+    "limit": 5
+}
