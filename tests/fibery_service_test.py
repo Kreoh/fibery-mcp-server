@@ -39,4 +39,5 @@ async def test_create_entity() -> None:
     assert creation_result.success is True, "Entity creation failed"
 
     deletion_result = await fibery_client.delete_entity("Product Management/Item", fibery_id)
-    assert deletion_result.success is True, "Entity deletion failed"
+    assert deletion_result.success is False, "Entity deletion should be blocked for safety"
+    assert "blocked" in str(deletion_result.result).lower(), "Delete command should return a blocked error"

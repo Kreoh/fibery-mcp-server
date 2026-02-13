@@ -68,7 +68,7 @@ def _find_name_field(field_names: List[str]) -> str | None:
     return None
 
 
-def _candidate_user_databases(schema: Schema) -> List[Database]:
+def _candidate_user_databases(schema: Schema, require_email: bool, require_name: bool) -> List[Database]:
     user_databases: List[Database] = []
     fallback_databases: List[Database] = []
 
@@ -79,12 +79,16 @@ def _candidate_user_databases(schema: Schema) -> List[Database]:
 
         email_field = _find_email_field(field_names)
         name_field = _find_name_field(field_names)
-        if email_field is None and name_field is None:
+        if require_email and email_field is None:
+            continue
+        if require_name and name_field is None:
+            continue
+        if not require_email and not require_name and email_field is None and name_field is None:
             continue
 
         if "user" in database.name.lower():
             user_databases.append(database)
-        elif email_field is not None and name_field is not None:
+        else:
             fallback_databases.append(database)
 
     return user_databases + fallback_databases
@@ -102,7 +106,11 @@ async def handle_resolve_user(fibery_client: FiberyClient, arguments: Dict[str, 
         return [mcp.types.TextContent(type="text", text="Error: limit must be at least 1.")]
 
     schema: Schema = await fibery_client.get_schema()
-    candidate_databases = _candidate_user_databases(schema)
+    candidate_databases = _candidate_user_databases(
+        schema,
+        require_email=email is not None,
+        require_name=name is not None,
+    )
     if len(candidate_databases) == 0:
         return [mcp.types.TextContent(type="text", text="Error: unable to identify a user database in this workspace.")]
 

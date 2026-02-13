@@ -76,3 +76,15 @@ async def test_handle_schema_includes_system_databases_when_requested() -> None:
     assert "Product Management/Feature" in content
     assert "fibery/user" in content
     assert "workflow/workflow" in content
+
+
+async def test_handle_schema_treats_string_false_as_disabled_for_system_databases() -> None:
+    schema = Schema(_raw_schema())
+    client = _FakeFiberyClient(schema)
+
+    response = await handle_schema(client, {"include_system_databases": "false"})
+    content = response[0].text
+
+    assert "Product Management/Feature" in content
+    assert "fibery/user" not in content
+    assert "workflow/workflow" not in content

@@ -28,7 +28,7 @@ def schema_tool() -> mcp.types.Tool:
 async def handle_schema(
     fibery_client: FiberyClient, arguments: Dict[str, Any] | None = None
 ) -> List[mcp.types.TextContent]:
-    include_system_databases = bool(arguments.get("include_system_databases", False)) if arguments else False
+    include_system_databases = arguments.get("include_system_databases") is True if arguments else False
 
     schema: Schema = await fibery_client.get_schema()
     db_list: List[Database] = schema.include_databases_from_schema(include_system_databases=include_system_databases)
