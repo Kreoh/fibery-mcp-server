@@ -20,6 +20,7 @@ def query_tool() -> mcp.types.Tool:
         description=description,
         inputSchema={
             "type": "object",
+            "additionalProperties": False,
             "properties": {
                 "q_from": {
                     "type": "string",
@@ -67,7 +68,7 @@ def query_tool() -> mcp.types.Tool:
                     "description": 'Dictionary of parameter values referenced in where using "$param" syntax. For example, {$fromDate: "2025-01-01"}',
                 },
             },
-            "required": ["q_from", "q_select", "q_limit"],
+            "required": ["q_from", "q_select"],
         },
     )
 

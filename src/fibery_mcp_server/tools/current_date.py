@@ -9,7 +9,7 @@ current_date_tool_name = "current_date"
 def current_date_tool() -> mcp.types.Tool:
     return mcp.types.Tool(
         name=current_date_tool_name,
-        description="Get today's date in ISO 8601 format (YYYY-mm-dd.HH:MM:SS.000Z)",
+        description="Get today's date in ISO 8601 format (YYYY-MM-DDTHH:MM:SS.000Z)",
         inputSchema={"type": "object"},
     )
 

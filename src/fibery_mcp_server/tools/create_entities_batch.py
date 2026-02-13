@@ -27,7 +27,8 @@ def create_entities_batch_tool() -> mcp.types.Tool:
                     "description": "Fibery Database where entities will be created.",
                 },
                 "entities": {
-                    "type": "object",
+                    "type": "array",
+                    "items": {"type": "object"},
                     "description": 'List of dictionaries that define what fields to set in format [{"FieldName": value}] (i.e. [{"Product Management/Name": "My new entity"}]).',
                 },
             },

@@ -1,5 +1,12 @@
-Run any Fibery API command. This gives tremendous flexibility, but requires a bit of experience with the low-level Fibery API. In case query succeeded, return value contains a list of records with fields you specified in select. If request failed, will return detailed error message.
-Examples (note, that these databases are non-existent, use databases only from user's schema!):
+Query Fibery entities using the Fibery `fibery.entity/query` command.
+Use this tool for `q_from`, `q_select`, `q_where`, `q_order_by`, `q_limit`, `q_offset`, and `q_params`.
+This tool does not execute arbitrary Fibery API commands.
+
+If the query succeeds, the result contains records with the fields from `q_select`.
+If the query fails, the result contains a detailed Fibery error payload.
+
+Examples (example database names may not exist in your workspace):
+
 Query: What newly created Features do we have for the past 2 months?
 Tool use:
 {
@@ -14,7 +21,7 @@ Tool use:
     "q_limit": 100,
     "q_offset": 0,
     "q_params": {
-        $twoMonthsAgo: "2025-01-16T00:00:00.000Z"
+        "$twoMonthsAgo": "2025-01-16T00:00:00.000Z"
     }
 }
 
@@ -29,48 +36,25 @@ Tool use:
         "State": ["workflow/state", "enum/name"]
     },
     "q_where": [
-        "q/and", # satisfy time AND states condition
-            [">", ["fibery/creation-date"], "$oneWeekAgo"],
-            [
-                "q/or", # nested or, since entity can be in either of these states
-                    ["=", ["workflow/state", "enum/name"], "$state1"],
-                    ["=", ["workflow/state", "enum/name"], "$state2"]
-            ]
+        "q/and",
+        [">", ["fibery/creation-date"], "$oneWeekAgo"],
+        [
+            "q/or",
+            ["=", ["workflow/state", "enum/name"], "$state1"],
+            ["=", ["workflow/state", "enum/name"], "$state2"]
+        ]
     ],
     "q_order_by": {"fibery/creation-date": "q/desc"},
     "q_limit": 100,
     "q_offset": 0,
-    "q_params": { # notice that parameters used in "where" are always passed in params!
-        $oneWeekAgo: "2025-03-07T00:00:00.000Z",
-        $state1: "Approval",
-        $state2: "Done"
+    "q_params": {
+        "$oneWeekAgo": "2025-03-07T00:00:00.000Z",
+        "$state1": "Approval",
+        "$state2": "Done"
     }
 }
 
-Query: What Admin Tasks for the past week are Approval or Done?
-Tool use:
-{
-    "q_from": "Administrative/Admin Task",
-    "q_select": {
-        "State": ["workflow/state", "enum/name"],
-        "Public Id": ["fibery/public-id"],
-        "Creation Date": ["fibery/creation-date"],
-        "Modification Date": ["fibery/modification-date"],
-        "Deadline": ["Administrative/Deadline"],
-        "Group": ["Administrative/Group", "Administrative/name"],
-        "Name": ["Administrative/Name"],
-        "Priority": ["Administrative/Priority_Administrative/Admin Task", "enum/name"]
-    },
-    "q_where": ["!=", ["workflow/state", "workflow/Final"], "$stateType"], # Administrative/Admin Task is not "Finished" yet
-    "q_order_by": {"fibery/creation-date": "q/desc"},
-    "q_limit": 100,
-    "q_offset": 0,
-    "q_params: {
-        "$stateType": true
-    }
-}
-
-Query: Summarize acc contacts with public id 1.
+Query: Summarize Accounting contacts with public id 1.
 Tool use:
 {
     "q_from": "Accounting/Acc Contacts",
@@ -83,6 +67,6 @@ Tool use:
     "q_where": ["=", ["fibery/public-id"], "$publicId"],
     "q_limit": 1,
     "q_params": {
-        $publicId: "1",
+        "$publicId": "1"
     }
 }
