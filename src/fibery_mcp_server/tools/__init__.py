@@ -54,7 +54,7 @@ def handle_list_tools():
 
 async def handle_tool_call(fibery_client: FiberyClient, name: str, arguments: Dict[str, Any]):
     if name == schema_tool_name:
-        return await handle_schema(fibery_client)
+        return await handle_schema(fibery_client, arguments)
     elif name == database_tool_name:
         return await handle_database(fibery_client, arguments)
     elif name == query_tool_name:

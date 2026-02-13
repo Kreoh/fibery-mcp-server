@@ -8,9 +8,12 @@ This MCP (Model Context Protocol) server provides integration between Fibery and
 - Discover available Fibery databases and inspect their fields
 - Query Fibery entities with flexible `q/from`, `q/select`, `q/where`, ordering, and pagination
 - Create entities individually or in batch
-- Update existing entities, including rich-text document fields
-- Add or remove items in collection relation fields
+- Update existing entities, including rich-text document fields and batch update operations
+- Add relation items with `update_collection` (add-only) and remove relation items with `unlink_collection`
+- Resolve user identities with normalised `fibery/id`, email, and name output
 - Use a date helper tool for ISO 8601 timestamps in workflows and prompts
+
+Safety note: delete is not exposed.
 
 ## 📦 Installation
 
@@ -85,7 +88,7 @@ Returns the current date/time in ISO 8601 format (`YYYY-MM-DDTHH:MM:SS.000Z`).
 
 #### 2. List Databases (`list_databases`)
 
-Retrieves a list of all databases available in your Fibery workspace.
+Retrieves a list of databases available in your Fibery workspace. By default, internal/system databases are hidden; set `include_system_databases` to include them.
 
 #### 3. Describe Database (`describe_database`)
 
@@ -109,7 +112,19 @@ Updates existing entities in your Fibery workspace with new field values.
 
 #### 8. Update Collection (`update_collection`)
 
-Adds or removes relation items in collection fields (for example, assigning or unassigning related entities).
+Adds relation items in collection fields (add-only).
+
+#### 9. Unlink Collection (`unlink_collection`)
+
+Removes relation items from collection fields with explicit confirmation (`confirm_unlink`).
+
+#### 10. Update Entities Batch (`update_entities_batch`)
+
+Updates multiple entities in one call. Each item requires `fibery/id`, with explicit confirmation (`confirm_batch`).
+
+#### 11. Resolve User (`resolve_user`)
+
+Resolves users by email and/or name and returns normalised identity records (`fibery/id`, email, name).
 
 ## 🧪 Development and Quality Checks
 

@@ -84,9 +84,12 @@ class Schema:
     def databases_by_name(self) -> Dict[str, Database]:
         return {db.name: db for db in self.__databases}
 
-    def include_databases_from_schema(self) -> List[Database]:
+    def include_databases_from_schema(self, include_system_databases: bool = False) -> List[Database]:
         if not self.__databases:
             return []
+
+        if include_system_databases:
+            return list(self.__databases)
 
         databases: List[Database] = []
 
