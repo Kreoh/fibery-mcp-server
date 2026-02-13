@@ -7,17 +7,18 @@ import mcp
 
 from fibery_mcp_server.fibery_client import FiberyClient
 
-update_collection_tool_name = "update_collection"
+unlink_collection_tool_name = "unlink_collection"
 
 
-def update_collection_tool() -> mcp.types.Tool:
+def unlink_collection_tool() -> mcp.types.Tool:
     with open(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "descriptions", "update_collection"), "r"
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "descriptions", "unlink_collection"),
+        "r",
     ) as file:
         description = file.read()
 
     return mcp.types.Tool(
-        name=update_collection_tool_name,
+        name=unlink_collection_tool_name,
         description=description,
         inputSchema={
             "type": "object",
@@ -35,32 +36,31 @@ def update_collection_tool() -> mcp.types.Tool:
                     "type": "string",
                     "description": "Collection relation field name (for example, assignments/assignees).",
                 },
-                "operation": {
-                    "type": "string",
-                    "enum": ["add"],
-                    "description": "Collection operation to apply (add only).",
-                },
                 "item_ids": {
                     "type": "array",
                     "items": {
                         "type": "string",
                     },
-                    "description": "List of related entity fibery/id values to add.",
+                    "description": "List of related entity fibery/id values to unlink.",
+                },
+                "confirm_unlink": {
+                    "type": "boolean",
+                    "description": "Explicit confirmation for unlink/removal operations. Must be true.",
                 },
             },
-            "required": ["database", "entity_id", "field", "operation", "item_ids"],
+            "required": ["database", "entity_id", "field", "item_ids", "confirm_unlink"],
         },
     )
 
 
-async def handle_update_collection(
+async def handle_unlink_collection(
     fibery_client: FiberyClient, arguments: Dict[str, Any]
 ) -> List[mcp.types.TextContent]:
     database_name: str = arguments.get("database")
     entity_id: str = arguments.get("entity_id")
     field: str = arguments.get("field")
-    operation: str = arguments.get("operation")
     item_ids: List[str] = arguments.get("item_ids")
+    confirm_unlink: bool = arguments.get("confirm_unlink", False)
 
     if not database_name:
         return [mcp.types.TextContent(type="text", text="Error: database is not provided.")]
@@ -71,13 +71,18 @@ async def handle_update_collection(
     if not field:
         return [mcp.types.TextContent(type="text", text="Error: field is not provided.")]
 
-    if operation != "add":
-        return [mcp.types.TextContent(type="text", text='Error: operation should be "add".')]
-
     if not item_ids or len(item_ids) == 0:
         return [mcp.types.TextContent(type="text", text="Error: item_ids is not provided.")]
 
-    update_result = await fibery_client.add_collection_items(database_name, entity_id, field, item_ids)
+    if confirm_unlink is not True:
+        return [
+            mcp.types.TextContent(
+                type="text",
+                text="Error: confirm_unlink must be true to remove relation items.",
+            )
+        ]
+
+    update_result = await fibery_client.remove_collection_items(database_name, entity_id, field, item_ids)
 
     if not update_result.success:
         return [mcp.types.TextContent(type="text", text=json.dumps(asdict(update_result)))]
@@ -86,8 +91,8 @@ async def handle_update_collection(
         mcp.types.TextContent(
             type="text",
             text=(
-                "Collection updated successfully. "
-                f'Database: "{database_name}", Entity: "{entity_id}", Field: "{field}", Operation: "{operation}".'
+                "Collection items unlinked successfully. "
+                f'Database: "{database_name}", Entity: "{entity_id}", Field: "{field}".'
             ),
         )
     ]

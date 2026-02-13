@@ -1,0 +1,23 @@
+Update multiple Fibery entities in a single batch operation.
+
+Safety requirements:
+- Each entity must include `fibery/id`.
+- `confirm_batch` must be true.
+- Maximum batch size is 50 entities.
+
+Example:
+{
+    "database": "Product Management/Feature",
+    "entities": [
+        {
+            "fibery/id": "12345678-1234-5678-1234-567812345678",
+            "Product Management/Name": "Updated name"
+        },
+        {
+            "fibery/id": "87654321-4321-8765-4321-876543218765",
+            "workflow/state": "In Progress"
+        }
+    ],
+    "confirm_batch": true,
+    "fail_fast": true
+}

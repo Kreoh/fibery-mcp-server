@@ -189,6 +189,10 @@ class FiberyClient:
         return Schema(schema_data)
 
     async def execute_command(self, command: str, args: Dict[str, Any]) -> CommandResponse:
+        validation_error = self.validate_command(command, args)
+        if validation_error:
+            return CommandResponse(False, {"error": validation_error})
+
         result = await self.fetch_from_fibery(
             "/api/commands",
             method="POST",
@@ -202,6 +206,34 @@ class FiberyClient:
 
         result = result["data"][0]
         return CommandResponse(result["success"], result["result"])
+
+    @staticmethod
+    def validate_command(command: str, args: Dict[str, Any]) -> str | None:
+        if command == "fibery.entity/delete":
+            return 'Command "fibery.entity/delete" is blocked for safety. Deleting entities is not allowed.'
+
+        if command != "fibery.command/batch":
+            return None
+
+        nested_commands = args.get("commands")
+        if not isinstance(nested_commands, list):
+            return 'Command "fibery.command/batch" requires args.commands to be a list.'
+
+        allowed_nested_commands = {"fibery.entity/create", "fibery.entity/update"}
+        disallowed_commands = []
+        for nested in nested_commands:
+            nested_command = nested.get("command") if isinstance(nested, dict) else None
+            if nested_command not in allowed_nested_commands:
+                disallowed_commands.append(str(nested_command))
+
+        if len(disallowed_commands) > 0:
+            disallowed_commands_str = ", ".join(disallowed_commands)
+            return (
+                'Command "fibery.command/batch" contains disallowed nested command(s): '
+                f"{disallowed_commands_str}. Allowed nested commands are: fibery.entity/create, fibery.entity/update."
+            )
+
+        return None
 
     async def query(self, query: Dict[str, Any], params: Dict[str, Any] | None) -> CommandResponse:
         return await self.execute_command("fibery.entity/query", {"query": query, "params": params})
@@ -269,6 +301,22 @@ class FiberyClient:
                     map(
                         lambda entity: {
                             "command": "fibery.entity/create",
+                            "args": {"type": database, "entity": entity},
+                        },
+                        entities,
+                    )
+                ),
+            },
+        )
+
+    async def update_entities_batch(self, database: str, entities: List[Dict[str, Any]]) -> CommandResponse:
+        return await self.execute_command(
+            "fibery.command/batch",
+            {
+                "commands": list(
+                    map(
+                        lambda entity: {
+                            "command": "fibery.entity/update",
                             "args": {"type": database, "entity": entity},
                         },
                         entities,

@@ -1,0 +1,16 @@
+Remove items from a Fibery collection relation field.
+Use this tool for explicit unlink/remove operations.
+
+Safety requirement:
+- `confirm_unlink` must be true.
+
+Example:
+{
+    "database": "Kanban/Card",
+    "entity_id": "ea5a9b77-d16b-4bdc-b4f2-5dad6764ad0f",
+    "field": "assignments/assignees",
+    "item_ids": [
+        "f2a89e59-6a5a-439c-ab10-5e376548e8c9"
+    ],
+    "confirm_unlink": true
+}

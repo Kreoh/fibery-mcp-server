@@ -87,6 +87,12 @@ Run all hooks manually:
 uv run --frozen pre-commit run --all-files
 ```
 
+Before committing, run pre-commit on changed files (or all files if preferred):
+
+```bash
+uv run --frozen pre-commit run --files <changed-files>
+```
+
 ## Tool implementation conventions
 
 When adding a new MCP tool:
@@ -114,6 +120,7 @@ Keep tool names and schema properties stable unless there is a deliberate breaki
 
 - `tests/fibery_service_test.py` hits a real Fibery workspace and is skipped unless `FIBERY_HOST` and `FIBERY_API_TOKEN` are set.
 - Other tests validate tool registration and input schema shape and should run without external services.
+- For test runs, use `uv run --frozen pytest` (add flags/paths as needed, for example `uv run --frozen pytest -q tests/command_safety_test.py`).
 
 ## Dependency and release hygiene
 
